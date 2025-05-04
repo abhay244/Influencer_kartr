@@ -13,7 +13,6 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(256), nullable=False)
     user_type = db.Column(db.String(20), nullable=False)  # 'sponsor' or 'influencer'
     date_registered = db.Column(db.DateTime, default=datetime.utcnow)
-    email_visible = db.Column(db.Boolean, default=False)  # Flag to control email visibility in search results
     
     # Relationships
     youtube_channels = db.relationship('YouTubeChannel', backref='user', lazy=True)
