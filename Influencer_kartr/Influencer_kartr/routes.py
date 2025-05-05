@@ -487,38 +487,3 @@ def search():
                          query=query,
                          channels=channels,
                          users=users)
-
-@app.route('/api/search_suggestions', methods=['GET'])
-def api_search_suggestions():
-    """API endpoint for search suggestions (autocomplete)"""
-    query = request.args.get('q', '')
-    if len(query) < 2:
-        return jsonify([])
-    
-    suggestions = []
-    
-    # Get YouTube channel suggestions
-    channels = YouTubeChannel.query.filter(
-        YouTubeChannel.title.ilike(f'%{query}%')
-    ).limit(5).all()
-    
-    for channel in channels:
-        suggestions.append({
-            'id': f"channel_{channel.id}",
-            'text': channel.title,
-            'type': 'channel'
-        })
-    
-    # Get user suggestions from database.csv (respecting privacy settings)
-    from youtube_utils import search_users
-    user_results = search_users(query, respect_privacy=True)
-    
-    for user in user_results:
-        suggestions.append({
-            'id': f"user_{user.get('username')}",
-            'text': user.get('username'),
-            'email': user.get('email'),
-            'type': user.get('user_type')
-        })
-    
-    return jsonify(suggestions)

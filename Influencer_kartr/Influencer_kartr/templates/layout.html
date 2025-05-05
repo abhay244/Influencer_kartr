@@ -214,18 +214,6 @@
 
         // Only add event listener if the search input exists
         if (searchInput && searchResults) {
-            // Handle search form submission
-            const searchBtn = document.querySelector('.search-btn');
-            if (searchBtn) {
-                searchBtn.addEventListener('click', () => {
-                    const query = searchInput.value.trim();
-                    if (query.length > 0) {
-                        window.location.href = `/search?q=${encodeURIComponent(query)}`;
-                    }
-                });
-            }
-            
-            // Handle search input for autocomplete
             searchInput.addEventListener('input', (e) => {
                 clearTimeout(searchTimeout);
                 const query = e.target.value.trim();
@@ -236,8 +224,7 @@
                 }
 
                 searchTimeout = setTimeout(() => {
-                    // Use the new API endpoint for autocomplete suggestions
-                    fetch(`/api/search_suggestions?q=${encodeURIComponent(query)}`)
+                    fetch(`/api/search?q=${encodeURIComponent(query)}`)
                         .then(response => response.json())
                         .then(data => {
                             displaySearchResults(data);
@@ -246,17 +233,6 @@
                             console.error('Search error:', error);
                         });
                 }, 300);
-            });
-            
-            // Handle Enter key press in search input
-            searchInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    const query = searchInput.value.trim();
-                    if (query.length > 0) {
-                        window.location.href = `/search?q=${encodeURIComponent(query)}`;
-                    }
-                }
             });
         }
 
@@ -277,51 +253,24 @@
                 results.forEach(result => {
                     const resultItem = document.createElement('div');
                     resultItem.className = 'search-result-item';
-                    
-                    // Different display based on result type
-                    if (result.type === 'channel') {
-                        // YouTube channel result
-                        resultItem.innerHTML = `
-                            <div class="search-result-icon">
-                                <i class="fab fa-youtube text-danger"></i>
-                            </div>
-                            <div class="search-result-info">
-                                <div class="search-result-name">${result.text}</div>
-                                <div class="search-result-type">YouTube Channel</div>
-                            </div>
-                        `;
-                        resultItem.addEventListener('click', () => {
-                            window.location.href = `/search?q=${encodeURIComponent(result.text)}`;
-                        });
-                    } else {
-                        // User result (influencer or sponsor)
-                        let iconClass = 'fas fa-user';
-                        if (result.type === 'influencer') {
-                            iconClass = 'fas fa-star';
-                        } else if (result.type === 'sponsor') {
-                            iconClass = 'fas fa-briefcase';
-                        }
-                        
-                        resultItem.innerHTML = `
-                            <div class="search-result-icon">
-                                <i class="${iconClass}"></i>
-                            </div>
-                            <div class="search-result-info">
-                                <div class="search-result-name">${result.text}</div>
-                                <div class="search-result-type">${result.type.charAt(0).toUpperCase() + result.type.slice(1)}</div>
-                                ${result.email ? 
-                                    `<div class="search-result-email">
-                                        <i class="fas fa-envelope me-1"></i>${result.email}
-                                    </div>` : 
-                                    '<div class="search-result-email">Email: Private</div>'
-                                }
-                            </div>
-                        `;
-                        resultItem.addEventListener('click', () => {
-                            window.location.href = `/search?q=${encodeURIComponent(result.text)}`;
-                        });
-                    }
-                    
+                    resultItem.innerHTML = `
+                        <img src="${result.avatar || '/static/img/default-avatar.png'}" 
+                             alt="${result.name}" 
+                             class="search-result-avatar">
+                        <div class="search-result-info">
+                            <div class="search-result-name">${result.name}</div>
+                            <div class="search-result-type">${result.type}</div>
+                            ${result.email_visible ? 
+                                `<div class="search-result-email">
+                                    <i class="fas fa-envelope me-1"></i>${result.email}
+                                </div>` : 
+                                '<div class="search-result-email">Email: Private</div>'
+                            }
+                        </div>
+                    `;
+                    resultItem.addEventListener('click', () => {
+                        window.location.href = `/profile/${result.id}`;
+                    });
                     searchResults.appendChild(resultItem);
                 });
             }

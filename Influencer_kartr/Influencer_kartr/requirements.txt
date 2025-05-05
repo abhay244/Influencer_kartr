@@ -14,5 +14,3 @@ sqlalchemy
 werkzeug
 wtforms
 youtube-transcript-api
-flask
-pyrebase4

@@ -1,16 +1,8 @@
-modules = ["python-3.11"]
+modules = ["bash", "python-3.11"]
 
 [nix]
 channel = "stable-24_05"
 packages = ["glibcLocales"]
-
-[deployment]
-deploymentTarget = "autoscale"
-run = ["gunicorn", "--bind", "0.0.0.0:5000", "main:app"]
-
-[[ports]]
-localPort = 5000
-externalPort = 80
 
 [workflows]
 runButton = "Project"
@@ -22,10 +14,22 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Start application"
+args = "Setup Influencer_kartr"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "setup_workflow"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Run Influencer_kartr"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Run Application"
 
 [[workflows.workflow]]
-name = "Start application"
+name = "Setup Influencer_kartr"
 author = "agent"
 
 [workflows.workflow.metadata]
@@ -36,5 +40,55 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "gunicorn --bind 0.0.0.0:5000 --reuse-port --reload main:app"
+args = "bash setup.sh"
+
+[[workflows.workflow]]
+name = "setup_workflow"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "chmod +x setup.sh && ./setup.sh"
+
+[[workflows.workflow]]
+name = "Run Influencer_kartr"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd Influencer_kartr && python main.py"
 waitForPort = 5000
+
+[[workflows.workflow]]
+name = "Run Application"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "FLASK_APP=main.py python main.py"
+waitForPort = 5000
+
+[deployment]
+run = ["sh", "-c", "bash setup.sh"]
+
+[[ports]]
+localPort = 5000
+externalPort = 80
