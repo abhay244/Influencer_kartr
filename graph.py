@@ -5,7 +5,7 @@ from flask import Flask, render_template, jsonify
 
 app = Flask(__name__)
 
-CSV_FILE = r'data\analysis_results.csv'
+CSV_FILE = r'data/analysis_results.csv'
 
 def load_creator_sponsor_graph():
     nodes = {}

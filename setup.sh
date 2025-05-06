@@ -29,7 +29,7 @@ cd "$PROJECT_DIR" || exit
 
 # Clone the repository
 echo -e "${YELLOW}Cloning the repository...${NC}"
-git clone https://github.com/Shadowmage-commits/Influencer_kartr.git .
+git clone https://github.com/abhay244/Influencer_kartr.git
 
 # Check if clone was successful
 if [ $? -ne 0 ]; then
